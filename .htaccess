@@ -1,0 +1,9 @@
+DirectoryIndex index.php
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteCond %{SCRIPT_FILENAME} !-d
+  RewriteCond %{SCRIPT_FILENAME} !-f
+  RewriteRule ^ index.php [L]
+  RewriteRule !^(index\.php|README\.md) [NC,F]
+</IfModule>

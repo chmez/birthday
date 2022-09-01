@@ -15,7 +15,7 @@ if (
 }
 
 if (empty($message)) {
-  $message = date(strtr($_GET['format'], [
+  $message = date(strtr($_GET['format'] ?: 'YY/MM/DD', [
     'DD' => 'd',
     'MM' => 'm',
     'YY' => 'y',

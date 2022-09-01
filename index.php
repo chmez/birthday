@@ -1,12 +1,13 @@
 <?php
 
-$fields = ['message', 'day', 'month'];
+$time = time();
+$fields = ['format', 'message', 'day', 'month'];
 
 if (
   count(array_intersect_key($_GET, array_fill_keys($fields, NULL))) === count($fields) &&
   !empty($_GET['message'])
 ) {
-  [$day, $month] = explode(',', date('j,n'));
+  [$day, $month] = explode(',', date('j,n', $time));
 
   if ($_GET['day'] == $day && $_GET['month'] == $month) {
     $message = $_GET['message'];
@@ -14,7 +15,13 @@ if (
 }
 
 if (empty($message)) {
-  $message = date('d.m.y');
+  $message = date(strtr($_GET['format'], [
+    'DD' => 'd',
+    'MM' => 'm',
+    'YY' => 'y',
+    'Day' => 'l',
+    'Month' => 'F',
+  ]), $time);
 }
 
 $response = [

@@ -1,7 +1,5 @@
 <?php
 
-$frames = [];
-
 $fields = ['message', 'day', 'month'];
 
 if (
@@ -11,11 +9,19 @@ if (
   [$day, $month] = explode(',', date('j,n'));
 
   if ($_GET['day'] == $day && $_GET['month'] == $month) {
-    $frames[] = ['text' => $_GET['message']];
+    $message = $_GET['message'];
   }
 }
 
-$response = ['frames' => [$frames]];
+if (empty($message)) {
+  $message = date('d.m.y');
+}
+
+$response = [
+  'frames' => [
+    ['text' => $message],
+  ],
+];
 
 header('Content-Type: text/json');
 

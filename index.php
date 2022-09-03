@@ -1,21 +1,42 @@
 <?php
 
 $time = time();
-$fields = ['format', 'message', 'day', 'month'];
+$messages = $known_names = [];
+[$day, $month] = explode(',', date('j,n', $time));
+$unknown_names = FALSE;
 
-if (
-  count(array_intersect_key($_GET, array_fill_keys($fields, NULL))) === count($fields) &&
-  !empty($_GET['message'])
-) {
-  [$day, $month] = explode(',', date('j,n', $time));
+for ($delta = 0; $delta < 10; $delta++) {
+  $suffix = $delta > 0 ? $delta : '';
 
-  if ($_GET['day'] == $day && $_GET['month'] == $month) {
-    $message = $_GET['message'];
+  if (
+    !empty($_GET['day' . $suffix]) &&
+    !empty($_GET['month' . $suffix]) &&
+    $_GET['day' . $suffix] == $day &&
+    $_GET['month' . $suffix] == $month
+  ) {
+    if (!empty($_GET['name' . $suffix])) {
+      $known_names[] = $_GET['name' . $suffix];
+    }
+    else {
+      $unknown_names = TRUE;
+    }
   }
 }
 
+if (!empty($known_names) || $unknown_names) {
+  if (!empty($known_names)) {
+    $messages = $known_names;
+
+    if ($unknown_names) {
+      $messages[] = 'and others';
+    }
+  }
+
+  $messages[] = $_GET['message'] ?: 'Happy birthday!';
+}
+
 if (empty($message)) {
-  $message = date(strtr($_GET['format'] ?: 'YY/MM/DD', [
+  $messages[] = date(strtr($_GET['format'] ?: 'YY/MM/DD', [
     'DD' => 'd',
     'MM' => 'm',
     'YY' => 'y',
@@ -25,9 +46,7 @@ if (empty($message)) {
 }
 
 $response = [
-  'frames' => [
-    ['text' => $message],
-  ],
+  'frames' => array_map(fn($message) => ['text' => $message], $messages),
 ];
 
 header('Content-Type: text/json');

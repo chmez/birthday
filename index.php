@@ -1,6 +1,19 @@
 <?php
 
-$time = time();
+if (isset($_SERVER['HTTP_GEOIP_COUNTRY_CODE'])) {
+  require_once 'vendor/geoip/geoip/src/timezone.php';
+
+  $timezone = get_time_zone($_SERVER['HTTP_GEOIP_COUNTRY_CODE'], '01');
+
+  if ($timezone !== NULL) {
+    date_default_timezone_set($timezone);
+  }
+}
+
+$time = isset($_SERVER['HTTP_X_LAMETRIC_TIMESTAMPUTC'])
+  ? floor($_SERVER['HTTP_X_LAMETRIC_TIMESTAMPUTC'] / 1000)
+  : time();
+
 $messages = $known_names = [];
 [$day, $month] = explode(',', date('j,n', $time));
 $unknown_names = FALSE;
@@ -35,7 +48,7 @@ if (!empty($known_names) || $unknown_names) {
   $messages[] = $_GET['message'] ?: 'Happy birthday!';
 }
 
-if (empty($message)) {
+if (empty($messages)) {
   $messages[] = date(strtr($_GET['format'] ?: 'YY/MM/DD', [
     'DD' => 'd',
     'MM' => 'm',
